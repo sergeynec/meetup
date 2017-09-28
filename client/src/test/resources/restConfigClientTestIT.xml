@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="stringConverter" class="ru.necs.client.common.converter.StringConverter"/>
+
+    <bean class="ru.necs.client.rest.RestConfigClientFactoryBean">
+        <constructor-arg name="convertersRegistry">
+            <map>
+                <entry key="#{T(java.lang.String)}" value-ref="stringConverter"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="context">
+            <bean class="ru.necs.client.rest.model.RestConfigContext">
+                <property name="url" value="http://localhost:#{T(ru.necs.client.rest.RestConfigClientTestIT).PORT}"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+</beans>

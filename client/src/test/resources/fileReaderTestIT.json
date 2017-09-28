@@ -1,0 +1,23 @@
+[
+  {
+    "key": {
+      "name": "key1",
+      "attributes": []
+    },
+    "value": "value1"
+  },
+  {
+    "key": {
+      "name": "key2",
+      "attributes": []
+    },
+    "value": "100500"
+  },
+  {
+    "key": {
+      "name": "key3",
+      "attributes": []
+    },
+    "value": "true"
+  }
+]

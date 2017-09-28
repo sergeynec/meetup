@@ -1,0 +1,34 @@
+[
+  {
+    "key": {
+      "name": "string.parameter",
+      "attributes": [
+        {
+          "key": "OS",
+          "value": "Windows"
+        },
+        {
+          "key": "version",
+          "value": "7"
+        }
+      ]
+    },
+    "value": "string.value"
+  },
+  {
+    "key": {
+      "name": "long.parameter",
+      "attributes": [
+        {
+          "key": "OS",
+          "value": "Windows"
+        },
+        {
+          "key": "version",
+          "value": "7"
+        }
+      ]
+    },
+    "value": "100500"
+  }
+]
