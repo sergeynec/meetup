@@ -1,12 +1,11 @@
 package ru.necs.spi.controller;
 
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -23,40 +22,32 @@ public class HelloControllerTest {
 		System.setProperty("spring.profiles.active", "h2");
 	}
 
-    @Test(expectedExceptions=SocketException.class)
-    public void checkSPILoadingWithoutLibrary() throws Exception{
-    	AbstractApplicationContext context = new AnnotationConfigApplicationContext(SPIConfig.class,
+	@Test(expectedExceptions = ConnectException.class)
+	public void checkSPILoadingWithoutLibrary() throws Exception {
+		AbstractApplicationContext context = new AnnotationConfigApplicationContext(SPIConfig.class,
 				DomainConfig.class);
-    	try(Socket s= new Socket("localhost", 7777)){}
+		try (Socket s = new Socket("localhost", 7777)) {
+		}
 		context.close();
-    }
-    
-  
-    
-    @Test
-    public void checkSPILoadingLibrary() throws Exception{
-    	File socketJarFile = null;
-    	addLibrary(socketJarFile.toURI().toURL());
-    	AbstractApplicationContext context = new AnnotationConfigApplicationContext(SPIConfig.class,
-				DomainConfig.class);
-    	try(Socket s = new Socket("localhost", 7777)){
-    	assertTrue(s.isConnected());
-		context.close();
-		assertTrue(s.isClosed());
-    	}
-    }
-    
-    private static void addLibrary(URL url) throws IOException {
-    	URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-    	  Class<URLClassLoader> sysclass = URLClassLoader.class;
+	}
 
-    	  try {
-    	     Method method = sysclass.getDeclaredMethod("addURL", new Class[] {URL.class});
-    	     method.setAccessible(true);
-    	     method.invoke(sysloader, new Object[]{url});
-    	  } catch (Throwable t) {
-    	     t.printStackTrace();
-    	     throw new IOException("Error, could not add URL to system classloader");
-    	  }
-    }
+	@Test
+	public void checkSPILoadingLibrary() throws Exception {
+		File socketJarFile = new File("src/test/resources/socket.jar");
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		context.setClassLoader(
+				new URLClassLoader(new URL[] { socketJarFile.toURI().toURL() }, ClassLoader.getSystemClassLoader()));
+		context.register(DomainConfig.class, SPIConfig.class);
+		context.refresh();
+		try (Socket s = new Socket("localhost", 7777)) {
+		}
+		context.close();
+		try {
+			try (Socket s = new Socket("localhost", 7777)) {
+				fail("Must failed on Connection refused: connect exception");
+			}
+		} catch (ConnectException e) {
+			assertEquals(e.getMessage(), "Connection refused: connect");
+		}
+	}
 }
